@@ -12,25 +12,59 @@ namespace Tibia
         {
             equipmentRepository = new EquipmentRepository();
         }
-        private EquipmentRepository equipmentRepository = new EquipmentRepository();
-        public Character Retrieve(string characterName)
+        private EquipmentRepository equipmentRepository { get; set; }
+        public Character Get(string charName)
         {
-            var character = new Character(characterName);
-            character.CharacterName = characterName;
-            character.Equipment = equipmentRepository.Retrieve(characterName);
-            if(characterName == "Jacula")
-            {
-                character.Level = 100;
-                character.Guild = "Onwer of Thais";
-                character.Vocation = "Knight";
-            }
-            else if(characterName == "Rosool")
-            {
-                character.Level = 87;
-                character.Guild = "We dont care";
-                character.Vocation = "Elite Knight";
-            }
+            var character = new Character();
+            character = CharBase.First(charac => charac.CharacterName == charName);
             return character;
+        }
+        public static List<Character> CharBase = new List<Character>();
+        public void Add(Character character)
+        {
+            CharBase.Add(character);
+        }
+        public void GetStats(string charName)
+        {
+            var character = new Character();
+            character = new CharacterRepository().Get(charName);
+            var exp = character.Experience;
+            var lvl = character.Level;
+            Console.WriteLine($"Level: {lvl}");
+            Console.WriteLine($"Exp: {exp}");
+        }
+        public void UpdateStats(string charName, Monster monster)
+        {
+            var character = new Character();
+            character = new CharacterRepository().Get(charName);
+            character.Experience = character.Experience + monster.Exp;
+            character.Level = SetLevel(character);
+            character.Equipment.Backpack.AddRange(monster.Loot);
+            CharBase.Insert(CharBase.FindIndex(index => index.CharacterName == charName), character);
+        }
+        public int SetLevel(Character character)
+        {
+            if(character.Experience >= 100 && character.Experience < 200)
+            {
+                character.Level = 2;
+            }
+            if (character.Experience >= 200 && character.Experience < 350)
+            {
+                character.Level = 3;
+            }
+            if (character.Experience >= 350 && character.Experience < 500)
+            {
+                character.Level = 4;
+            }
+            if (character.Experience >= 500 && character.Experience < 750)
+            {
+                character.Level = 5;
+            }
+            if (character.Experience >= 750 && character.Experience < 1000)
+            {
+                character.Level = 6;
+            }
+            return character.Level;
         }
     }
 }

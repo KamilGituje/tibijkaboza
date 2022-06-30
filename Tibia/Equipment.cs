@@ -20,5 +20,6 @@ namespace Tibia
         public string Shield { get; set; }
         public string Boots { get; set; }
         public string Ring { get; set; }
+        public List<string> Backpack = new List<string>();
     }
 }
