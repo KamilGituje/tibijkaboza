@@ -10,13 +10,11 @@ namespace Tibia
     {
         public CharacterRepository()
         {
-            equipmentRepository = new EquipmentRepository();
+
         }
-        private EquipmentRepository equipmentRepository { get; set; }
         public Character Get(string charName)
         {
-            var character = new Character();
-            character = CharBase.First(charac => charac.CharacterName == charName);
+            var character = CharBase.FirstOrDefault(charac => charac.CharacterName == charName);
             return character;
         }
         public static List<Character> CharBase = new List<Character>();
@@ -26,17 +24,13 @@ namespace Tibia
         }
         public void GetStats(string charName)
         {
-            var character = new Character();
-            character = new CharacterRepository().Get(charName);
-            var exp = character.Experience;
-            var lvl = character.Level;
-            Console.WriteLine($"Level: {lvl}");
-            Console.WriteLine($"Exp: {exp}");
+            var character = Get(charName);
+            Console.WriteLine($"Level: {character.Level}");
+            Console.WriteLine($"Exp: {character.Experience}");
         }
         public void UpdateStats(string charName, Monster monster)
         {
-            var character = new Character();
-            character = new CharacterRepository().Get(charName);
+            var character = Get(charName);
             character.Experience = character.Experience + monster.Exp;
             character.Level = SetLevel(character);
             character.Equipment.Backpack.AddRange(monster.Loot);

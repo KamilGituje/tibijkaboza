@@ -33,18 +33,18 @@ namespace Tibia
                 }
                 if (task == "2")
                 {
-                    var monsterRepository = new MonsterRepository();
-                    monsterRepository.GetRotworm(charName);
+                    var characterService = new CharacterService();
+                    characterService.KillMonster(charName, "Dog");
                 }
                 if (task == "3")
                 {
-                    var monsterRepository = new MonsterRepository();
-                    monsterRepository.GetCyclops(charName);
+                    var characterService = new CharacterService();
+                    characterService.KillMonster(charName, "Rotworm");
                 }
                 if (task == "4")
                 {
-                    var monsterRepository = new MonsterRepository();
-                    monsterRepository.GetDog();
+                    var characterService = new CharacterService();
+                    characterService.KillMonster(charName, "Cyclops");
                 }
                 if (task == "0")
                 {

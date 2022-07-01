@@ -10,61 +10,31 @@ namespace Tibia
     {
         public MonsterRepository()
         {
-            characterRepository = new CharacterRepository();
+            MobBase.Add(new Monster()
+            {
+                Name = "Dog",
+                Exp = 0
+            });
+
+            MobBase.Add(new Monster()
+            {
+                Name = "Rotworm",
+                Exp = 35,
+                Loot = new LootItemRepository("Rotworm").GetLoot()
+            });
+
+            MobBase.Add(new Monster()
+            {
+                Name = "Cyclops",
+                Exp = 150,
+                Loot = new LootItemRepository("Cyclops").GetLoot()
+            });
         }
-        private CharacterRepository characterRepository { get; set; }
-        public void GetDog()
+        public static List<Monster> MobBase = new List<Monster>();
+        public Monster Get (string monsterName)
         {
-            var monster = new Monster();
-            monster.MonsterName = "Dog";
-            monster.Exp = 0;
-            Console.WriteLine($"You killed a {monster.MonsterName}");
-        }
-        public void GetRotworm(string charName)
-        {
-            var monster = new Monster();
-            monster.MonsterName = "Rotworm";
-            monster.Exp = 35;
-            if (Utility.Drop(0.2) == true)
-            {
-                monster.Loot.Add("Katana");
-            }
-            if (Utility.Drop(0.25) == true)
-            {
-                monster.Loot.Add("Legion helmet");
-            }
-            Console.WriteLine($"You killed a {monster.MonsterName}");
-            Console.WriteLine("You gained " + monster.Exp + " exp");
-            foreach (var item in monster.Loot)
-            {
-                Console.WriteLine("You looted " + item);
-            }
-            characterRepository.UpdateStats(charName, monster);
-        }
-        public void GetCyclops(string charName)
-        {
-            var monster = new Monster();
-            monster.MonsterName = "Cyclops";
-            monster.Exp = 150;
-            if (Utility.Drop(0.6) == true)
-            {
-                monster.Loot.Add("Short sword");
-            }
-            if (Utility.Drop(0.1) == true)
-            {
-                monster.Loot.Add("Halberd");
-            }
-            if (Utility.Drop(0.3) == true)
-            {
-                monster.Loot.Add("Cyclops toe");
-            }
-            Console.WriteLine($"You killed a {monster.MonsterName}");
-            Console.WriteLine("You gained " + monster.Exp + " exp");
-            foreach (var item in monster.Loot)
-            {
-                Console.WriteLine("You looted " + item);
-            }
-            characterRepository.UpdateStats(charName, monster);
+            var monster = MobBase.First(mob => mob.Name == monsterName);
+            return monster;
         }
     }
 }

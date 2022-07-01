@@ -12,7 +12,7 @@ namespace Tibia
         {
             Loot = new List<string>();
         }
-        public string MonsterName { get; set; }
+        public string Name { get; set; }
         public List<string> Loot { get; set; }
         public int Exp { get; set; }
     }
