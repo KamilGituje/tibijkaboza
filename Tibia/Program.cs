@@ -48,6 +48,7 @@ namespace Tibia
                 }
                 if (task == "0")
                 {
+                    Console.WriteLine("Items in backpack:");
                     var backpack = characterRepository.Get(charName).Equipment.Backpack;
                     foreach (var item in backpack)
                     {

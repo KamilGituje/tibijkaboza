@@ -17,7 +17,7 @@ namespace Tibia
             var character = CharBase.FirstOrDefault(charac => charac.CharacterName == charName);
             return character;
         }
-        public static List<Character> CharBase = new List<Character>();
+        private static List<Character> CharBase = new List<Character>();
         public void Add(Character character)
         {
             CharBase.Add(character);
@@ -28,37 +28,35 @@ namespace Tibia
             Console.WriteLine($"Level: {character.Level}");
             Console.WriteLine($"Exp: {character.Experience}");
         }
-        public void UpdateStats(string charName, Monster monster)
+        public void Update(Character character)
         {
-            var character = Get(charName);
-            character.Experience = character.Experience + monster.Exp;
-            character.Level = SetLevel(character);
-            character.Equipment.Backpack.AddRange(monster.Loot);
-            CharBase.Insert(CharBase.FindIndex(index => index.CharacterName == charName), character);
+            character.Level = SetLevel(character.Experience);
+            CharBase.Insert(CharBase.FindIndex(index => index.CharacterName == character.CharacterName), character);
         }
-        public int SetLevel(Character character)
+        public int SetLevel(int exp)
         {
-            if(character.Experience >= 100 && character.Experience < 200)
+            int level = 1;
+            if(exp >= 100 && exp < 200)
             {
-                character.Level = 2;
+                level = 2;
             }
-            if (character.Experience >= 200 && character.Experience < 350)
+            if (exp >= 200 && exp < 350)
             {
-                character.Level = 3;
+                level = 3;
             }
-            if (character.Experience >= 350 && character.Experience < 500)
+            if (exp >= 350 && exp < 500)
             {
-                character.Level = 4;
+                level = 4;
             }
-            if (character.Experience >= 500 && character.Experience < 750)
+            if (exp >= 500 && exp < 750)
             {
-                character.Level = 5;
+                level = 5;
             }
-            if (character.Experience >= 750 && character.Experience < 1000)
+            if (exp >= 750)
             {
-                character.Level = 6;
+                level = 6;
             }
-            return character.Level;
+            return level;
         }
     }
 }

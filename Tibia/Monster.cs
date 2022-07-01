@@ -10,10 +10,10 @@ namespace Tibia
     {
         public Monster()
         {
-            Loot = new List<string>();
+            Loot = new List<LootItem>();
         }
         public string Name { get; set; }
-        public List<string> Loot { get; set; }
+        public List<LootItem> Loot { get; set; }
         public int Exp { get; set; }
     }
 }

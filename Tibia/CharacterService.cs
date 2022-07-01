@@ -20,7 +20,7 @@ namespace Tibia
         {
             var character = characterRepository.Get(charName);
             var monster = monsterRepository.Get(monsterName);
-            var loot = new LootItemRepository(monsterName).GetLoot();
+            var loot = GetLoot(monsterName);
             character.Equipment.Backpack.AddRange(loot);
             character.Experience = character.Experience + monster.Exp;
             Console.WriteLine($"You killed a {monsterName}");
@@ -29,6 +29,21 @@ namespace Tibia
             {
                 Console.WriteLine($"You looted a {item}");
             }
+            characterRepository.Update(character);
+        }
+        public List<LootItem> Items { get; set; }
+        public List<string> GetLoot(string monsterName)
+        {
+            var items = new MonsterRepository().Get(monsterName).Loot;
+            var list = new List<string>();
+            foreach (var item in items)
+            {
+                if (Utility.Drop(item.DropRate) == true)
+                {
+                    list.Add(item.ItemName);
+                }
+            }
+            return list;
         }
 
     }
