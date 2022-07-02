@@ -20,5 +20,7 @@ namespace Tibia
         public Equipment Equipment { get; set; }
         public int Level { get; set; }
         public int Experience { get; set; }
+        public double CurrentCapacity { get; set; }
+        public int MaxCapacity { get; set; }
     }
 }

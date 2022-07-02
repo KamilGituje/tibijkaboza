@@ -30,10 +30,14 @@ namespace Tibia
         }
         public void Update(Character character)
         {
-            character.Level = SetLevel(character.Experience);
+            character.Level = GetLevel(character.Experience);
+            if(character.CurrentCapacity > character.MaxCapacity)
+            {
+                character.CurrentCapacity = character.MaxCapacity;
+            }
             CharBase.Insert(CharBase.FindIndex(index => index.CharacterName == character.CharacterName), character);
         }
-        public int SetLevel(int exp)
+        public int GetLevel(int exp)
         {
             int level = 1;
             if(exp >= 100 && exp < 200)

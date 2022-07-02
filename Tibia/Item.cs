@@ -6,13 +6,16 @@ using System.Threading.Tasks;
 
 namespace Tibia
 {
-    public class LootItem
+    public class Item
     {
-        public LootItem()
+        public Item()
         {
 
         }
+
         public double DropRate { get; set; }
-        public string ItemName { get; set; }
+        public string Name { get; set; }
+        public double Weight { get; set; }
+        public int Price { get; set; }
     }
 }

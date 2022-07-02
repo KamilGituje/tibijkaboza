@@ -17,9 +17,13 @@ namespace Tibia
             character.Guild = Console.ReadLine();
             character.Level = 1;
             character.Experience = 0;
+            character.MaxCapacity = 500;
+            character.CurrentCapacity = character.MaxCapacity;
+            character.Equipment.Gold = 0;
             var characterRepository = new CharacterRepository();
             characterRepository.Add(character);
             var charName = character.CharacterName;
+            var characterService = new CharacterService();
 
             bool inProgress = true;
 
@@ -33,18 +37,21 @@ namespace Tibia
                 }
                 if (task == "2")
                 {
-                    var characterService = new CharacterService();
                     characterService.KillMonster(charName, "Dog");
                 }
                 if (task == "3")
                 {
-                    var characterService = new CharacterService();
                     characterService.KillMonster(charName, "Rotworm");
                 }
                 if (task == "4")
                 {
-                    var characterService = new CharacterService();
                     characterService.KillMonster(charName, "Cyclops");
+                }
+                if (task == "9")
+                {
+                    Console.WriteLine("Sell item:");
+                    var item = Console.ReadLine();
+                    characterService.SellLoot(item, charName);
                 }
                 if (task == "0")
                 {
@@ -52,8 +59,10 @@ namespace Tibia
                     var backpack = characterRepository.Get(charName).Equipment.Backpack;
                     foreach (var item in backpack)
                     {
-                        Console.WriteLine(item);
+                        Console.WriteLine(item.Name);
                     }
+                    Console.WriteLine($"Capacity: {Math.Round(character.CurrentCapacity)}");
+                    Console.WriteLine($"Gold: {character.Equipment.Gold}");
                 }
             }
         }
