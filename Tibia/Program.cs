@@ -49,9 +49,11 @@ namespace Tibia
                 }
                 if (task == "9")
                 {
+                    Console.WriteLine("NPC name:");
+                    var npcName = Console.ReadLine();
                     Console.WriteLine("Sell item:");
-                    var item = Console.ReadLine();
-                    characterService.SellLoot(item, charName);
+                    var itemName = Console.ReadLine();
+                    characterService.SellLoot(npcName, itemName, charName);
                 }
                 if (task == "0")
                 {

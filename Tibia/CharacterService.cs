@@ -55,12 +55,39 @@ namespace Tibia
             }
             return list;
         }
-        public void SellLoot (string itemName, string charName)
+        public void SellLoot(string npcName, string itemName, string charName)
         {
             var character = characterRepository.Get(charName);
-            character.Equipment.Gold = character.Equipment.Gold + itemRepository.Get(itemName).Price;
-            character.CurrentCapacity = character.CurrentCapacity + itemRepository.Get(itemName).Weight;
-            characterRepository.Update(character);
+            var npc = new NpcRepository().GetNpc(npcName);
+            bool npcSells = false;
+            bool charHasGot = false;
+            if (npc.ItemsSell.Select(item => item.Name).Contains(itemName) == true)
+            {
+                npcSells = true;
+                if(character.Equipment.Backpack.Select(item => item.Name).Contains(itemName) == true)
+                {
+                    charHasGot = true;
+                }
+            }
+            if (npcSells == true)
+            {
+                if (charHasGot == true)
+                {
+                    character.Equipment.Gold = character.Equipment.Gold + npc.ItemsSell.First(item => item.Name == itemName).ItemPrice;
+                    character.CurrentCapacity = character.CurrentCapacity + npc.ItemsSell.First(item => item.Name == itemName).Weight;
+                    character.Equipment.Backpack.Remove(character.Equipment.Backpack.First(item => item.Name == itemName));
+                    characterRepository.Update(character);
+                    Console.WriteLine($"You sold a {itemName} for {npc.ItemsSell.First(item => item.Name == itemName).ItemPrice}");
+                }
+                else
+                {
+                    Console.WriteLine($"You don't have {itemName.ToLower()}");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"{npcName} doesn't buy {itemName.ToLower()}");
+            }
         }
     }
 }

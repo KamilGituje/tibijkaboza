@@ -6,14 +6,12 @@ using System.Threading.Tasks;
 
 namespace Tibia
 {
-    public class Item
+    public class NpcItem : Item
     {
-        public Item()
+        public NpcItem()
         {
 
         }
-
-        public string Name { get; set; }
-        public double Weight { get; set; }
+        public int ItemPrice { get; set; }
     }
 }

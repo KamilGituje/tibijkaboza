@@ -19,8 +19,8 @@ namespace Tibia
                 Exp = 35,
                 Loot =
                 {
-                    new ItemRepository().Get("Katana"),
-                    new ItemRepository().Get("Legion helmet")
+                    new LootItemRepository("Katana").SetDropRate(0.2),
+                    new LootItemRepository("Legion helmet").SetDropRate(0.25)
                 }
             });
 
@@ -30,9 +30,9 @@ namespace Tibia
                 Exp = 150,
                 Loot =
                 {
-                    new ItemRepository().Get("Halberd"),
-                    new ItemRepository().Get("Short sword"),
-                    new ItemRepository().Get("Cyclops toe")
+                    new LootItemRepository("Halberd").SetDropRate(0.1),
+                    new LootItemRepository("Short sword").SetDropRate(0.6),
+                    new LootItemRepository("Cyclops toe").SetDropRate(0.3)
                 }
             });
         }
