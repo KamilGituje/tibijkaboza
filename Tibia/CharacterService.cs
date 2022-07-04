@@ -12,11 +12,12 @@ namespace Tibia
         {
             characterRepository = new CharacterRepository();
             monsterRepository = new MonsterRepository();
-            itemRepository = new ItemRepository();
+            npcRepository = new NpcRepository();
         }
         private CharacterRepository characterRepository { get; set; }
         private MonsterRepository monsterRepository { get; set; }
-        private ItemRepository itemRepository { get; set; }
+        private NpcRepository npcRepository { get; set; }
+
         
         public void KillMonster (string charName, string monsterName)
         {
@@ -41,10 +42,9 @@ namespace Tibia
             }
             characterRepository.Update(character);
         }
-        public List<Item> Items { get; set; }
         public List<Item> GetLoot(string monsterName)
         {
-            var items = new MonsterRepository().Get(monsterName).Loot;
+            var items = monsterRepository.Get(monsterName).Loot;
             var list = new List<Item>();
             foreach (var item in items)
             {
@@ -55,29 +55,23 @@ namespace Tibia
             }
             return list;
         }
-        public void SellLoot(string npcName, string itemName, string charName)
+        public void SellItem(string npcName, string itemName, string charName)
         {
             var character = characterRepository.Get(charName);
-            var npc = new NpcRepository().GetNpc(npcName);
-            bool npcSells = false;
-            bool charHasGot = false;
-            if (npc.ItemsSell.Select(item => item.Name).Contains(itemName) == true)
+            var npc = npcRepository.GetNpc(npcName);
+            var item = npc.ItemsBuy.First(item => item.Name == itemName);
+            bool isNpcBuying = npc.ItemsBuy.Any(itemnpc => itemnpc.Name == itemName);
+            bool isInBp = character.Equipment.Backpack.Any(itembp => itembp.Name == itemName);
+
+            if (isNpcBuying)
             {
-                npcSells = true;
-                if(character.Equipment.Backpack.Select(item => item.Name).Contains(itemName) == true)
+                if (isInBp)
                 {
-                    charHasGot = true;
-                }
-            }
-            if (npcSells == true)
-            {
-                if (charHasGot == true)
-                {
-                    character.Equipment.Gold = character.Equipment.Gold + npc.ItemsSell.First(item => item.Name == itemName).ItemPrice;
-                    character.CurrentCapacity = character.CurrentCapacity + npc.ItemsSell.First(item => item.Name == itemName).Weight;
+                    character.Equipment.Gold = character.Equipment.Gold + item.ItemPrice;
+                    character.CurrentCapacity = character.CurrentCapacity + item.Weight;
                     character.Equipment.Backpack.Remove(character.Equipment.Backpack.First(item => item.Name == itemName));
                     characterRepository.Update(character);
-                    Console.WriteLine($"You sold a {itemName} for {npc.ItemsSell.First(item => item.Name == itemName).ItemPrice}");
+                    Console.WriteLine($"You sold a {itemName} for {item.ItemPrice}");
                 }
                 else
                 {

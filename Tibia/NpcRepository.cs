@@ -13,7 +13,7 @@ namespace Tibia
             NpcBase.Add(new Npc
             {
                 Name = "Sam",
-                ItemsSell =
+                ItemsBuy =
                 {
                     new NpcItemRepository("Katana").SetPrice(60),
                     new NpcItemRepository("Short sword").SetPrice(20),
@@ -24,7 +24,7 @@ namespace Tibia
             NpcBase.Add(new Npc
             {
                 Name = "Frodo",
-                ItemsSell =
+                ItemsBuy =
                 {
                     new NpcItemRepository("Cyclops toe").SetPrice(30)
                 }

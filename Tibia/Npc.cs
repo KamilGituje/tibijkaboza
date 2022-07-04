@@ -10,9 +10,9 @@ namespace Tibia
     {
         public Npc()
         {
-            ItemsSell = new List<NpcItem>();
+            ItemsBuy = new List<NpcItem>();
         }
         public string Name { get; set; }
-        public List<NpcItem> ItemsSell { get; set; }
+        public List<NpcItem> ItemsBuy { get; set; }
     }
 }
