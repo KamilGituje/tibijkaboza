@@ -1,32 +1,29 @@
 ﻿using DB1;
+using Microsoft.EntityFrameworkCore;
 using TibiaModels.BL;
+using TibiaRepositories.BL.Interfaces;
 
 namespace TibiaRepositories.BL
 {
-    public class ItemRepository
+    public class ItemRepository : IItemRepository
     {
-        public ItemRepository()
+        public ItemRepository(PubContext _context)
         {
+            context = _context;
+        }
+        private readonly PubContext context;
 
-        }
-
-        public Item Get(int itemId)
+        public async Task<Item> GetAsync(int itemId)
         {
-            using var context = new PubContext();
-            var item = context.Items.FirstOrDefault(i => i.ItemId == itemId);
-            return item;
+            return await context.Items.FirstOrDefaultAsync(i => i.ItemId == itemId);
         }
-        public Item GetByName(string itemName)
+        public async Task<Item> GetByNameAsync(string itemName)
         {
-            using var context = new PubContext();
-            var item = context.Items.FirstOrDefault(i => i.Name == itemName);
-            return item;
+            return await context.Items.FirstOrDefaultAsync(i => i.Name == itemName);
         }
-        public bool IsExist (string itemName)
+        public async Task<bool> IsExistAsync (string itemName)
         {
-            using var context = new PubContext();
-            bool isExist = context.Items.Any(i => i.Name == itemName);
-            return isExist;
+            return await context.Items.AnyAsync(i => i.Name == itemName);
         }
     }
 }

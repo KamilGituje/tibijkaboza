@@ -1,32 +1,33 @@
 ﻿using DB1;
 using Microsoft.EntityFrameworkCore;
 using TibiaModels.BL;
+using TibiaRepositories.BL.Interfaces;
 
 namespace TibiaRepositories.BL
 {
-    public class CharacterRepository
+    public class CharacterRepository : ICharacterRepository
     {
-        public CharacterRepository()
+        public CharacterRepository(PubContext _context)
         {
-
+            context = _context;
         }
-        public Character Get(int characterId)
+        private readonly PubContext context;
+        public async Task<Character> GetAsync(int characterId)
         {
-            using var context = new PubContext();
-            var character = context.Characters.FirstOrDefault(c => c.CharacterId == characterId);
-            return character;
+            return await context.Characters.FirstOrDefaultAsync(c => c.CharacterId == characterId);
         }
-        public Character GetWithItems(int characterId)
+        public async Task<Character> GetWithItemsAsync(int characterId)
         {
-            using var context = new PubContext();
-            var character = context.Characters.Include(c => c.Equipment).ThenInclude(e => e.ItemInstances).ThenInclude(ii => ii.Item).FirstOrDefault(c => c.CharacterId == characterId);
-            return character;
+            return await context.Characters.Include(c => c.Equipment).ThenInclude(e => e.ItemInstances).ThenInclude(ii => ii.Item).FirstOrDefaultAsync(c => c.CharacterId == characterId);
         }
-        public bool IsExist(int characterId)
+        public async Task<bool> IsExistAsync(int characterId)
         {
-            using var context = new PubContext();
-            var isExist = context.Characters.Any(c => c.CharacterId == characterId);
-            return isExist;
+            return await context.Characters.AnyAsync(c => c.CharacterId == characterId);
+        }
+        public async Task<bool> SaveChangesAsync()
+        {
+            await context.SaveChangesAsync();
+            return true;
         }
     }
 }

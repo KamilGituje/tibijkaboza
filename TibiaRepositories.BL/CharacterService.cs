@@ -1,23 +1,29 @@
-﻿using DB1;
+﻿using AutoMapper;
+using DB1;
+using Microsoft.EntityFrameworkCore;
 using TibiaModels.BL;
+using TibiaRepositories.BL.Interfaces;
 
 namespace TibiaRepositories.BL
 {
-    public class CharacterService
+    public class CharacterService : ICharacterService
     {
-        public CharacterService()
+        public CharacterService(PubContext _context, ICharacterRepository _characterRepository, IMonsterRepository _monsterRepository, INpcRepository _npcRepository,
+            IItemRepository _itemRepository)
         {
-            characterRepository = new CharacterRepository();
-            monsterRepository = new MonsterRepository();
-            npcRepository = new NpcRepository();
-            itemRepository = new ItemRepository();
+            characterRepository = _characterRepository;
+            monsterRepository = _monsterRepository;
+            npcRepository = _npcRepository;
+            itemRepository = _itemRepository;
+            context = _context;
         }
-        private CharacterRepository characterRepository { get; set; }
-        private MonsterRepository monsterRepository { get; set; }
-        private NpcRepository npcRepository { get; set; }
-        private ItemRepository itemRepository { get; set; }
+        private readonly ICharacterRepository characterRepository;
+        private readonly IMonsterRepository monsterRepository;
+        private readonly INpcRepository npcRepository;
+        private readonly IItemRepository itemRepository;
+        private readonly PubContext context;
 
-        public bool isValid(Character character)
+        public bool IsValid(Character character)
         {
             bool isValid = false;
             if (!string.IsNullOrWhiteSpace(character.Name))
@@ -28,36 +34,36 @@ namespace TibiaRepositories.BL
                     }
             return isValid;
         }
-        public void Create(Character character)
+        public async Task<Character> CreateAsync(Character character)
         {
-            using var context = new PubContext();
-            context.Characters.Add(character);
-            context.SaveChanges();
-            var backpackId = itemRepository.GetByName("Jacula backpack").ItemId;
+            if(!IsValid(character))
+            {
+                return null;
+            }
+            SetLevel(character);
+            await context.Characters.AddAsync(character);
+            await context.SaveChangesAsync();
+            var backpackId = (await itemRepository.GetByNameAsync("Jacula backpack")).ItemId;
             var backpack = new ItemInstance
             {
                 ItemId = backpackId,
                 EquipmentId = character.Equipment.EquipmentId,
             };
-            context.ItemInstances.Add(backpack);
-            context.SaveChanges();
+            await context.ItemInstances.AddAsync(backpack);
+            await context.SaveChangesAsync();
             character.Equipment.BackpackInstanceId = backpack.ItemInstanceId;
-            context.Update(character);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
+            return character;
         }
-        public List<Item> KillMonster(Character character, Monster monster)
+        public async Task<List<Item>> KillMonsterAsync(Character character, Monster monster)
         {
-            using var context = new PubContext();
             character.Experience = character.Experience + monster.Experience;
             var loot = RandomLoot(monster.ItemMonsters);
             character = SetLevel(character);
-            context.Update(character);
-            context.SaveChanges();
             return loot;
         }
-        public List<Item> GetLoot(Character character, List<Item> loot)
+        public async Task<List<Item>> GetLootAsync(Character character, List<Item> loot)
         {
-            using var context = new PubContext();
             var itemsCarried = new List<Item>();
             foreach (var item in loot)
             {
@@ -67,15 +73,14 @@ namespace TibiaRepositories.BL
                     {
                         ItemId = item.ItemId,
                         EquipmentId = character.Equipment.EquipmentId,
-                        ContainerId = character.Equipment.BackpackInstanceId
+                        ContainerId = character.Equipment.BackpackInstanceId,
+                        Quantity = 1
                     };
-                    context.ItemInstances.Add(itemInstance);
+                    await context.ItemInstances.AddAsync(itemInstance);
                     character.CurrentCapacity = character.CurrentCapacity - item.Weight;
                     itemsCarried.Add(item);
                 }
             }
-            context.Update(character);
-            context.SaveChanges();
             return itemsCarried;
         }
         public List<Item> RandomLoot(List<ItemMonster> loot)
@@ -90,15 +95,12 @@ namespace TibiaRepositories.BL
             }
             return list;
         }
-        public int SellItem(int npcId, int itemId, Character character)
+        public async Task<int> SellItemAsync(Npc npc, Item item, Character character)
         {
-            using var context = new PubContext();
-            var npc = npcRepository.GetWithItems(npcId);
-            var item = npc.ItemNpcs.FirstOrDefault(itn => itn.ItemId == itemId);
-            var goldId = itemRepository.GetByName("Gold coin").ItemId;
+            var goldId = (await itemRepository.GetByNameAsync("Gold coin")).ItemId;
             bool hasCharMoney = character.Equipment.ItemInstances.Any(ii => ii.ItemId == goldId && ii.ContainerId == character.Equipment.BackpackInstanceId);
-            var coinWeight = itemRepository.Get(goldId).Weight;
-            var quantity = item.Price;
+            var coinWeight = (await itemRepository.GetAsync(goldId)).Weight;
+            var quantity = npc.ItemNpcs.FirstOrDefault(itn => itn.ItemId == item.ItemId).Price;
 
             if (!hasCharMoney)
             {
@@ -115,32 +117,26 @@ namespace TibiaRepositories.BL
             {
                 var gold = character.Equipment.ItemInstances.FirstOrDefault(ii => ii.ItemId == goldId && ii.ContainerId == character.Equipment.BackpackInstanceId);
                 gold.Quantity = gold.Quantity + quantity;
-                context.Update(gold);
             }
-            character.CurrentCapacity = character.CurrentCapacity + item.Item.Weight - (quantity * coinWeight);
+            character.CurrentCapacity = character.CurrentCapacity + item.Weight - (quantity * coinWeight);
             if (character.CurrentCapacity > character.MaxCapacity)
             {
                 character.CurrentCapacity = character.MaxCapacity;
             }
-            context.Remove(character.Equipment.ItemInstances.FirstOrDefault(ii => ii.ItemId == itemId && ii.ContainerId == character.Equipment.BackpackInstanceId));
-            context.Update(character);
-            context.SaveChanges();
+            context.Remove(character.Equipment.ItemInstances.FirstOrDefault(ii => ii.ItemId == item.ItemId && ii.ContainerId == character.Equipment.BackpackInstanceId));
+
             return quantity;
         }
-        public bool IsInBp(Character character, int itemId)
+        public bool IsInBp(Character character, Item item)
         {
-            bool isInBp = character.Equipment.ItemInstances.Any(ii => ii.ItemId == itemId && ii.ContainerId == character.Equipment.BackpackInstanceId);
-            return isInBp;
+            return character.Equipment.ItemInstances.Any(ii => ii.ItemId == item.ItemId && ii.ContainerId == character.Equipment.BackpackInstanceId);
         }
-        public bool IsNpcBuying(int npcId, int itemId)
+        public bool IsNpcBuying(Npc npc, Item item)
         {
-            var npc = npcRepository.GetWithItems(npcId);
-            bool isNpcBuying = npc.ItemNpcs.Any(itn => itn.ItemId == itemId);
-            return isNpcBuying;
+            return npc.ItemNpcs.Any(itn => itn.ItemId == item.ItemId);
         }
         public Character SetLevel(Character character)
         {
-            var expLvlUp = 100;
             var levelBefore = character.Lvl;
             if (character.Experience >= 100)
             {
@@ -152,7 +148,29 @@ namespace TibiaRepositories.BL
                 character.MaxCapacity = character.MaxCapacity + (levelDiff * 10);
                 character.CurrentCapacity = character.CurrentCapacity + (levelDiff * 10);
             }
+            if (character.Lvl == 0)
+            {
+                character.Lvl++;
+                character.CurrentCapacity = 500;
+                character.MaxCapacity = 500;
+            }
             return character;
+        }
+        public List<Item> GetCharacterItemsInBp(Character character)
+        {
+            var items = character.Equipment.ItemInstances.Where(ii => ii.ContainerId == character.Equipment.BackpackInstanceId).ToList();
+            var itemsToReturn = new List<Item>();
+            foreach(var item in items)
+            {
+                itemsToReturn.Add(new Item
+                {
+                    ItemId = item.Item.ItemId,
+                    Name = item.Item.Name,
+                    Weight = item.Item.Weight * item.Quantity,
+                    Quantity = item.Quantity
+                });
+            }
+            return itemsToReturn;
         }
     }
 }

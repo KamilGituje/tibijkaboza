@@ -1,38 +1,36 @@
 ﻿using DB1;
 using Microsoft.EntityFrameworkCore;
 using TibiaModels.BL;
+using TibiaRepositories.BL.Interfaces;
 
 namespace TibiaRepositories.BL
 {
-    public class NpcRepository
+    public class NpcRepository : INpcRepository
     {
-        public NpcRepository()
+        public NpcRepository(PubContext _context)
         {
-
+            context = _context;
         }
-        public Npc Get (int npcId)
+        private readonly PubContext context;
+        public async Task<Npc> GetAsync (int npcId)
         {
-            using var context = new PubContext();
-            var npc = context.Npcs.FirstOrDefault(n => n.NpcId == npcId);
-            return npc;
+            return await context.Npcs.FirstOrDefaultAsync(n => n.NpcId == npcId);
         }
-        public Npc GetByName (string npcName)
+        public async Task<Npc> GetByNameAsync (string npcName)
         {
-            using var context = new PubContext();
-            var npc = context.Npcs.FirstOrDefault(n => n.Name == npcName);
-            return npc;
+            return await context.Npcs.FirstOrDefaultAsync(n => n.Name == npcName);
         }
-        public Npc GetWithItems (int npcId)
+        public async Task<Npc> GetWithItemsAsync (int npcId)
         {
-            using var context = new PubContext();
-            var npc = context.Npcs.Include(n => n.ItemNpcs).ThenInclude(itn => itn.Item).FirstOrDefault(n => n.NpcId == npcId);
-            return npc;
+            return await context.Npcs.Include(n => n.ItemNpcs).ThenInclude(itn => itn.Item).FirstOrDefaultAsync(n => n.NpcId == npcId);
         }
-        public bool IsExist (string npcName)
+        public async Task<Npc> GetWithItemsByNameAsync(string npcName)
         {
-            using var context = new PubContext();
-            bool isExist = context.Npcs.Any(n => n.Name == npcName);
-            return isExist;
+            return await context.Npcs.Include(n => n.ItemNpcs).ThenInclude(itn => itn.Item).FirstOrDefaultAsync(n => n.Name == npcName);
+        }
+        public async Task<bool> IsExistAsync (string npcName)
+        {
+            return await context.Npcs.AnyAsync(n => n.Name == npcName);
         }
     }
 }

@@ -8,8 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ClassLibrary1\TibiaModels.BL.csproj" />
-    <ProjectReference Include="..\DB1\DB1.csproj" />
+    <ProjectReference Include="..\TibiaModels.BL\TibiaModels.BL.csproj" />
     <ProjectReference Include="..\TibiaRepositories.BL\TibiaRepositories.BL.csproj" />
   </ItemGroup>
 

@@ -1,26 +1,24 @@
 ﻿using DB1;
 using Microsoft.EntityFrameworkCore;
 using TibiaModels.BL;
+using TibiaRepositories.BL.Interfaces;
 
 namespace TibiaRepositories.BL
 {
-    public class MonsterRepository
+    public class MonsterRepository : IMonsterRepository
     {
-        public MonsterRepository()
+        public MonsterRepository(PubContext _context)
         {
-
+            context = _context;
         }
-        public Monster Get(int monsterId)
+        private readonly PubContext context;
+        public async Task<Monster> GetAsync(int monsterId)
         {
-            using var context = new PubContext();
-            var monster = context.Monsters.FirstOrDefault(m => m.MonsterId == monsterId);
-            return monster;
+            return await context.Monsters.FirstOrDefaultAsync(m => m.MonsterId == monsterId);
         }
-        public Monster GetWithItems(int monsterId)
+        public async Task<Monster> GetWithItemsAsync(int monsterId)
         {
-            using var context = new PubContext();
-            var monster = context.Monsters.Include(m => m.ItemMonsters).ThenInclude(im => im.Item).FirstOrDefault(m => m.MonsterId == monsterId);
-            return monster;
+            return await context.Monsters.Include(m => m.ItemMonsters).ThenInclude(im => im.Item).FirstOrDefaultAsync(m => m.MonsterId == monsterId);
         }
     }
 }

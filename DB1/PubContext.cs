@@ -5,6 +5,10 @@ namespace DB1
 {
     public class PubContext : DbContext
     {
+        public PubContext(DbContextOptions<PubContext> options) : base(options)
+        {
+
+        }
         public DbSet<Character> Characters { get; set; }
         public DbSet<Equipment> Equipments { get; set; }
         public DbSet<Item> Items { get; set; }
@@ -14,12 +18,6 @@ namespace DB1
         public DbSet<ItemNpc> ItemNpc { get; set; }
         public DbSet<ItemInstance> ItemInstances { get; set; }
 
-
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer("Data source = DESKTOP-HBGE4GF; Initial catalog = tibia; Integrated security = true");
-        }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<ItemNpc>().HasKey(itn => new { itn.NpcId, itn.ItemId });

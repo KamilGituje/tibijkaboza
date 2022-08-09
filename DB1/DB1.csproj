@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ClassLibrary1\TibiaModels.BL.csproj" />
+    <ProjectReference Include="..\TibiaModels.BL\TibiaModels.BL.csproj" />
   </ItemGroup>
 
 </Project>
