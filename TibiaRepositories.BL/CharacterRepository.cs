@@ -24,6 +24,17 @@ namespace TibiaRepositories.BL
         {
             return await context.Characters.AnyAsync(c => c.CharacterId == characterId);
         }
+        public async Task<bool> AddAsync(Character character)
+        {
+            await context.Characters.AddAsync(character);
+            await SaveChangesAsync();
+            return true;
+        }
+        public async Task RemoveItemFromBackpackAsync(Character character, Item item)
+        {
+            context.ItemInstances.Remove(character.Equipment.ItemInstances.FirstOrDefault(ii => ii.ItemId == item.ItemId && ii.ContainerId == character.Equipment.BackpackInstanceId));
+            await SaveChangesAsync();
+        }
         public async Task<bool> SaveChangesAsync()
         {
             await context.SaveChangesAsync();

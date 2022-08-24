@@ -20,6 +20,7 @@ builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddScoped<INpcRepository, NpcRepository>();
 builder.Services.AddScoped<IMonsterRepository, MonsterRepository>();
 builder.Services.AddScoped<ICharacterService, CharacterService>();
+builder.Services.AddScoped<IItemInstanceRepository, ItemInstanceRepository>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
