@@ -11,5 +11,6 @@ namespace TibiaRepositories.BL.Interfaces
     {
         Task<Monster> GetAsync(int monsterId);
         Task<Monster> GetWithItemsAsync(int monsterId);
+        Task<List<Monster>> GetMonstersAsync();
     }
 }

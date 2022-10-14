@@ -20,5 +20,7 @@ namespace TibiaModels.BL
         public int Experience { get; set; }
         public decimal CurrentCapacity { get; set; }
         public decimal MaxCapacity { get; set; }
+        public Guid UserId { get; set; }
+        public User User { get; set; }
     }
 }

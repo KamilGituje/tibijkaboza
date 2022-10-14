@@ -6,5 +6,6 @@
         public string Vocation { get; set; }
         public string Residence { get; set; }
         public string Guild { get; set; }
+        public Guid UserId { get; set; }
     }
 }

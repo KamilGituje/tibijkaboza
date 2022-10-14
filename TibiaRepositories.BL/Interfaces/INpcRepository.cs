@@ -9,6 +9,7 @@ namespace TibiaRepositories.BL.Interfaces
 {
     public interface INpcRepository
     {
+        Task<List<Npc>> GetNpcsAsync();
         Task<Npc> GetAsync(int npcId);
         Task<Npc> GetByNameAsync(string npcName);
         Task<Npc> GetWithItemsAsync(int npcId);

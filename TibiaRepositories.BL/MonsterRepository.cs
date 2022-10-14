@@ -20,5 +20,9 @@ namespace TibiaRepositories.BL
         {
             return await context.Monsters.Include(m => m.ItemMonsters).ThenInclude(im => im.Item).FirstOrDefaultAsync(m => m.MonsterId == monsterId);
         }
+        public async Task<List<Monster>> GetMonstersAsync()
+        {
+            return await context.Monsters.ToListAsync();
+        }
     }
 }
