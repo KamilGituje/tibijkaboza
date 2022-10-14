@@ -8,20 +8,15 @@ namespace TibiaRepositories.BL
 {
     public class CharacterService : ICharacterService
     {
-        public CharacterService(PubContext _context, ICharacterRepository _characterRepository, IMonsterRepository _monsterRepository, INpcRepository _npcRepository,
-            IItemRepository _itemRepository)
+        public CharacterService(ICharacterRepository _characterRepository, IItemRepository _itemRepository, IItemInstanceRepository _itemInstanceRepository)
         {
             characterRepository = _characterRepository;
-            monsterRepository = _monsterRepository;
-            npcRepository = _npcRepository;
             itemRepository = _itemRepository;
-            context = _context;
+            itemInstanceRepository = _itemInstanceRepository;
         }
         private readonly ICharacterRepository characterRepository;
-        private readonly IMonsterRepository monsterRepository;
-        private readonly INpcRepository npcRepository;
         private readonly IItemRepository itemRepository;
-        private readonly PubContext context;
+        private readonly IItemInstanceRepository itemInstanceRepository;
 
         public bool IsValid(Character character)
         {
@@ -41,18 +36,16 @@ namespace TibiaRepositories.BL
                 return null;
             }
             SetLevel(character);
-            await context.Characters.AddAsync(character);
-            await context.SaveChangesAsync();
+            await characterRepository.AddAsync(character);
             var backpackId = (await itemRepository.GetByNameAsync("Jacula backpack")).ItemId;
             var backpack = new ItemInstance
             {
                 ItemId = backpackId,
                 EquipmentId = character.Equipment.EquipmentId,
             };
-            await context.ItemInstances.AddAsync(backpack);
-            await context.SaveChangesAsync();
-            character.Equipment.BackpackInstanceId = backpack.ItemInstanceId;
-            await context.SaveChangesAsync();
+            var backpackInstanceId = await itemInstanceRepository.AddAsync(backpack);
+            character.Equipment.BackpackInstanceId = backpackInstanceId;
+            await characterRepository.SaveChangesAsync();
             return character;
         }
         public async Task<List<Item>> KillMonsterAsync(Character character, Monster monster)
@@ -60,6 +53,7 @@ namespace TibiaRepositories.BL
             character.Experience = character.Experience + monster.Experience;
             var loot = RandomLoot(monster.ItemMonsters);
             character = SetLevel(character);
+            await characterRepository.SaveChangesAsync();
             return loot;
         }
         public async Task<List<Item>> GetLootAsync(Character character, List<Item> loot)
@@ -76,11 +70,12 @@ namespace TibiaRepositories.BL
                         ContainerId = character.Equipment.BackpackInstanceId,
                         Quantity = 1
                     };
-                    await context.ItemInstances.AddAsync(itemInstance);
+                    await itemInstanceRepository.AddAsync(itemInstance);
                     character.CurrentCapacity = character.CurrentCapacity - item.Weight;
                     itemsCarried.Add(item);
                 }
             }
+            await characterRepository.SaveChangesAsync();
             return itemsCarried;
         }
         public List<Item> RandomLoot(List<ItemMonster> loot)
@@ -111,7 +106,7 @@ namespace TibiaRepositories.BL
                     EquipmentId = character.Equipment.EquipmentId,
                     Quantity = quantity
                 };
-                context.ItemInstances.Add(gold);
+                itemInstanceRepository.AddAsync(gold);
             }
             else
             {
@@ -123,7 +118,7 @@ namespace TibiaRepositories.BL
             {
                 character.CurrentCapacity = character.MaxCapacity;
             }
-            context.Remove(character.Equipment.ItemInstances.FirstOrDefault(ii => ii.ItemId == item.ItemId && ii.ContainerId == character.Equipment.BackpackInstanceId));
+            await characterRepository.RemoveItemFromBackpackAsync(character, item);
 
             return quantity;
         }

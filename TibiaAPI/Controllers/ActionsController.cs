@@ -37,26 +37,23 @@ namespace TibiaAPI.Controllers
             var monster = await monsterRepository.GetWithItemsAsync(monsterId);
             var loot = await characterService.KillMonsterAsync(character, monster);
             await characterService.GetLootAsync(character, loot);
-            await characterRepository.SaveChangesAsync();
             return Ok(mapper.Map<List<ItemDto>>(loot));
         }
-        [HttpPut("sellitem/{npcName}/{itemName}")]
-        public async Task<ActionResult<string>> SellItem(int characterId, string npcName, string itemName)
+        [HttpPut("sellitem/{npcId}/{itemId}")]
+        public async Task<ActionResult<string>> SellItem(int characterId, int npcId, int itemId)
         {
             var character = await characterRepository.GetWithItemsAsync(characterId);
-            var item = await itemRepository.GetByNameAsync(itemName);
+            var item = await itemRepository.GetAsync(itemId);
             if (!characterService.IsInBp(character, item))
             {
                 return BadRequest();
             }
-            var npc = await npcRepository.GetWithItemsByNameAsync(npcName);
+            var npc = await npcRepository.GetWithItemsAsync(npcId);
             if (!characterService.IsNpcBuying(npc, item))
             {
                 return BadRequest();
             }
-
             await characterService.SellItemAsync(npc, item, character);
-            await characterRepository.SaveChangesAsync();
             return NoContent();
         }
     }

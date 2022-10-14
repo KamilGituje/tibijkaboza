@@ -12,6 +12,8 @@ namespace TibiaRepositories.BL.Interfaces
         Task<Character> GetAsync(int characterId);
         Task<Character> GetWithItemsAsync(int characterId);
         Task<bool> IsExistAsync(int characterId);
+        Task<bool> AddAsync(Character character);
+        Task RemoveItemFromBackpackAsync(Character character, Item item);
         Task<bool> SaveChangesAsync();
     }
 }
