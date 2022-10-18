@@ -8,15 +8,17 @@ namespace TibiaRepositories.BL
 {
     public class CharacterService : ICharacterService
     {
-        public CharacterService(ICharacterRepository _characterRepository, IItemRepository _itemRepository, IItemInstanceRepository _itemInstanceRepository)
+        public CharacterService(ICharacterRepository _characterRepository, IItemRepository _itemRepository, IItemInstanceRepository _itemInstanceRepository, IUserRepository _userRepository)
         {
             characterRepository = _characterRepository;
             itemRepository = _itemRepository;
             itemInstanceRepository = _itemInstanceRepository;
+            userRepository = _userRepository;
         }
         private readonly ICharacterRepository characterRepository;
         private readonly IItemRepository itemRepository;
         private readonly IItemInstanceRepository itemInstanceRepository;
+        private readonly IUserRepository userRepository;
 
         public bool IsValid(Character character)
         {
@@ -29,13 +31,15 @@ namespace TibiaRepositories.BL
                     }
             return isValid;
         }
-        public async Task<Character> CreateAsync(Character character)
+        public async Task<Character> CreateAsync(Character character, Guid userId)
         {
             if(!IsValid(character))
             {
                 return null;
             }
+            var user = await userRepository.GetAsync(userId);
             SetLevel(character);
+            character.UserId = userId;
             await characterRepository.AddAsync(character);
             var backpackId = (await itemRepository.GetByNameAsync("Jacula backpack")).ItemId;
             var backpack = new ItemInstance
@@ -52,7 +56,7 @@ namespace TibiaRepositories.BL
         {
             character.Experience = character.Experience + monster.Experience;
             var loot = RandomLoot(monster.ItemMonsters);
-            character = SetLevel(character);
+            SetLevel(character);
             await characterRepository.SaveChangesAsync();
             return loot;
         }
@@ -106,7 +110,7 @@ namespace TibiaRepositories.BL
                     EquipmentId = character.Equipment.EquipmentId,
                     Quantity = quantity
                 };
-                itemInstanceRepository.AddAsync(gold);
+                await itemInstanceRepository.AddAsync(gold);
             }
             else
             {

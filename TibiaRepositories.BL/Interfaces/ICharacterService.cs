@@ -10,7 +10,7 @@ namespace TibiaRepositories.BL.Interfaces
     public interface ICharacterService
     {
         bool IsValid(Character character);
-        Task<Character> CreateAsync (Character character);
+        Task<Character> CreateAsync (Character character, Guid userId);
         Task<List<Item>> KillMonsterAsync (Character character, Monster monster);
         Task<List<Item>> GetLootAsync(Character character, List<Item> loot);
         List<Item> RandomLoot(List<ItemMonster> loot);

@@ -12,6 +12,10 @@ namespace TibiaRepositories.BL
             context = _context;
         }
         private readonly PubContext context;
+        public async Task<List<Npc>> GetNpcsAsync()
+        {
+            return await context.Npcs.ToListAsync();
+        }
         public async Task<Npc> GetAsync (int npcId)
         {
             return await context.Npcs.FirstOrDefaultAsync(n => n.NpcId == npcId);

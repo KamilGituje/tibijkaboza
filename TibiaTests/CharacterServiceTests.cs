@@ -7,7 +7,7 @@ using TibiaRepositories.BL.Interfaces;
 namespace TibiaTests
 {
     public class CharacterServiceTests : IDisposable
-    {     
+    {
         public CharacterServiceTests()
         {
             characterRepository = new Mock<ICharacterRepository>();

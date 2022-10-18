@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
@@ -30,17 +31,30 @@ namespace TibiaAPI.Controllers
         private readonly INpcRepository npcRepository;
         private readonly IMapper mapper;
 
+        [Authorize(policy: "CanAccessExp")]
         [HttpPut("killmonster/{monsterId}")]
-        public async Task<ActionResult<List<Item>>> KillMonster(int characterId, int monsterId)
+        public async Task<ActionResult<List<Item>>> KillMonsterAsync(int characterId, int monsterId)
         {
             var character = await characterRepository.GetWithItemsAsync(characterId);
             var monster = await monsterRepository.GetWithItemsAsync(monsterId);
             var loot = await characterService.KillMonsterAsync(character, monster);
-            await characterService.GetLootAsync(character, loot);
-            return Ok(mapper.Map<List<ItemDto>>(loot));
+            var lootCarried = await characterService.GetLootAsync(character, loot);
+            foreach(var item in loot)
+            {
+                if(!lootCarried.Contains(item))
+                {
+                    var itemTooHeavy = new Item()
+                    {
+                        Name = $"{item.Name} zbyt ciężki"
+                    };
+                    lootCarried.Add(itemTooHeavy);
+                }
+            }
+            return Ok(mapper.Map<List<ItemDto>>(lootCarried));
         }
+        [Authorize(policy: "CanAccessSell")]
         [HttpPut("sellitem/{npcId}/{itemId}")]
-        public async Task<ActionResult<string>> SellItem(int characterId, int npcId, int itemId)
+        public async Task<ActionResult<int>> SellItemAsync(int characterId, int npcId, int itemId)
         {
             var character = await characterRepository.GetWithItemsAsync(characterId);
             var item = await itemRepository.GetAsync(itemId);
@@ -53,8 +67,8 @@ namespace TibiaAPI.Controllers
             {
                 return BadRequest();
             }
-            await characterService.SellItemAsync(npc, item, character);
-            return NoContent();
+            var price = await characterService.SellItemAsync(npc, item, character);
+            return Ok(price);
         }
     }
 }

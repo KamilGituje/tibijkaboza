@@ -16,6 +16,10 @@ namespace TibiaRepositories.BL
         {
             return await context.Characters.FirstOrDefaultAsync(c => c.CharacterId == characterId);
         }
+        public async Task<List<Character>> GetForUserAsync(Guid userId)
+        {
+            return await context.Characters.Where(c => c.UserId == userId).ToListAsync();
+        }
         public async Task<Character> GetWithItemsAsync(int characterId)
         {
             return await context.Characters.Include(c => c.Equipment).ThenInclude(e => e.ItemInstances).ThenInclude(ii => ii.Item).FirstOrDefaultAsync(c => c.CharacterId == characterId);
@@ -40,5 +44,11 @@ namespace TibiaRepositories.BL
             await context.SaveChangesAsync();
             return true;
         }
+        public async Task<List<Character>> GetCharactersPaged(int pageNum)
+        {
+            int pageSize = 10;
+            return await context.Characters.OrderByDescending(c => c.Lvl).Skip((pageNum - 1) * pageSize).Take(pageSize + 1).ToListAsync();
+        }
+            
     }
 }

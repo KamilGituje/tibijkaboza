@@ -27,7 +27,7 @@ namespace TibiaTests
         private readonly Mock<INpcRepository> npcRepository;
         private readonly Mock<IMapper> mapper;
         private readonly ActionsController actionsController;
-        
+
         public void Dispose()
         {
 
@@ -41,7 +41,7 @@ namespace TibiaTests
             characterService.Setup(cs => cs.KillMonsterAsync(It.IsAny<Character>(), It.IsAny<Monster>())).ReturnsAsync(new List<Item>());
 
             //Act
-            var expected = await actionsController.KillMonster(2, 3);
+            var expected = await actionsController.KillMonsterAsync(2, 3);
 
             //Assert
             Assert.IsType<OkObjectResult>(expected.Result);
@@ -56,7 +56,7 @@ namespace TibiaTests
             characterService.Setup(cs => cs.IsNpcBuying(It.IsAny<Npc>(), It.IsAny<Item>())).Returns(true);
 
             //Act
-            var expected = await actionsController.SellItem(1, 2, 3);
+            var expected = await actionsController.SellItemAsync(1, 2, 3);
 
             //Assert
             Assert.IsType<BadRequestResult>(expected.Result);
@@ -71,7 +71,7 @@ namespace TibiaTests
             characterService.Setup(cs => cs.IsNpcBuying(It.IsAny<Npc>(), It.IsAny<Item>())).Returns(false);
 
             //Act
-            var expected = await actionsController.SellItem(1, 2, 3);
+            var expected = await actionsController.SellItemAsync(1, 2, 3);
 
             //Assert
             Assert.IsType<BadRequestResult>(expected.Result);
@@ -86,7 +86,7 @@ namespace TibiaTests
             characterService.Setup(cs => cs.IsNpcBuying(It.IsAny<Npc>(), It.IsAny<Item>())).Returns(true);
 
             //Act
-            var expected = await actionsController.SellItem(1, 2, 3);
+            var expected = await actionsController.SellItemAsync(1, 2, 3);
 
             //Assert
             Assert.IsType<NoContentResult>(expected.Result);
