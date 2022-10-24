@@ -89,7 +89,7 @@ namespace TibiaTests
             var expected = await actionsController.SellItemAsync(1, 2, 3);
 
             //Assert
-            Assert.IsType<NoContentResult>(expected.Result);
+            Assert.IsType<OkObjectResult>(expected.Result);
         }
     }
 }

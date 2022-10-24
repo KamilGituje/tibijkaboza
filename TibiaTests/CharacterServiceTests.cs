@@ -13,11 +13,13 @@ namespace TibiaTests
             characterRepository = new Mock<ICharacterRepository>();
             itemRepository = new Mock<IItemRepository>();
             itemInstanceRepository = new Mock<IItemInstanceRepository>();
-            characterService = new CharacterService(characterRepository.Object, itemRepository.Object, itemInstanceRepository.Object);
+            userRepository = new Mock<IUserRepository>();
+            characterService = new CharacterService(characterRepository.Object, itemRepository.Object, itemInstanceRepository.Object, userRepository.Object);
         }
         private readonly Mock<ICharacterRepository> characterRepository;
         private readonly Mock<IItemRepository> itemRepository;
         private readonly Mock<IItemInstanceRepository> itemInstanceRepository;
+        private readonly Mock<IUserRepository> userRepository;
         private readonly CharacterService characterService;
         public void Dispose()
         {
@@ -36,11 +38,11 @@ namespace TibiaTests
                 Name = "Name",
                 Vocation = "Vocation",
                 Residence = "Residence",
-                Guild = "Guild"
+                Guild = "Guild",
             };
 
             //Act
-            var characterCreated = await characterService.CreateAsync(character);
+            var characterCreated = await characterService.CreateAsync(character, new Guid());
 
             //Assert
             Assert.Equal(500, characterCreated.MaxCapacity);
