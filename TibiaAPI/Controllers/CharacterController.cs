@@ -21,13 +21,7 @@ namespace TibiaAPI.Controllers
         private readonly ICharacterService characterService;
         private readonly ICharacterRepository characterRepository;
         private readonly IMapper mapper;
-        
-        [HttpGet("jacula")]
-        public ActionResult<string> GetJacula()
-        {
-        return Ok("dupa");
-        }
-        
+
         [HttpGet("{characterId}", Name = "GetCharacter")]
         public async Task<ActionResult<CharacterWithoutEquipmentDto>> GetCharacterAsync(int characterId, bool includeEquipment = false)
         {
@@ -51,7 +45,7 @@ namespace TibiaAPI.Controllers
                 },
                 characterAdded);
         }
-        //[Authorize(policy: "CanAccessBackpack")]
+        [Authorize(policy: "CanAccessBackpack")]
         [HttpGet("{characterId}/backpack")]
         public async Task<ActionResult<List<ItemWithQuantityDto>>> GetCharacterItemsInBpAsync(int characterId)
         {
