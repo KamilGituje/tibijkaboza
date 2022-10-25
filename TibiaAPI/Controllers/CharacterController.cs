@@ -21,7 +21,13 @@ namespace TibiaAPI.Controllers
         private readonly ICharacterService characterService;
         private readonly ICharacterRepository characterRepository;
         private readonly IMapper mapper;
-
+        
+        [HttpGet("jacula")]
+        public ActionResult<string> GetJacula()
+        {
+        return Ok("dupa");
+        }
+        
         [HttpGet("{characterId}", Name = "GetCharacter")]
         public async Task<ActionResult<CharacterWithoutEquipmentDto>> GetCharacterAsync(int characterId, bool includeEquipment = false)
         {
