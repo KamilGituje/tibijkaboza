@@ -45,7 +45,7 @@ namespace TibiaAPI.Controllers
                 },
                 characterAdded);
         }
-        [Authorize(policy: "CanAccessBackpack")]
+        //[Authorize(policy: "CanAccessBackpack")]
         [HttpGet("{characterId}/backpack")]
         public async Task<ActionResult<List<ItemWithQuantityDto>>> GetCharacterItemsInBpAsync(int characterId)
         {
