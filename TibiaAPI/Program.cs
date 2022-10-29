@@ -56,7 +56,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<PubContext>(options => options.UseSqlServer(builder.Configuration["ConnectionStrings:TibiaDB"]));
+builder.Services.AddDbContext<PubContext>(options => options.UseSqlServer(builder.Configuration["ConnectionStrings:tibijkaboza"]));
 
 builder.Services.AddSingleton<JwtSettings>(new JwtSettings()
 {
